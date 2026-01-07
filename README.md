@@ -8,11 +8,14 @@ Monalert is a project to learn about Linux, Docker, Grafana, Prometheus.
 
 ```bash
 git clone https://github.com/klkkristof/Monalert.git && cd Monalert
+```
 
+```bash
 docker compose build --no-cache monalert 
+```
 
+```bash
 docker compose up
-
 ```
 
 
@@ -27,4 +30,15 @@ docker compose up
 
 
 
+## Test
 
+You can use the stress tool to make some tests:
+
+for example:
+```bash
+sudo apt install stress
+```
+
+```bash
+stress --cpu 4 
+```
