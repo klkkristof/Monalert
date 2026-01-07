@@ -1,2 +1,0 @@
-{"timestamp": "2026-01-06T16:39:14.632139", "cpu_percent": 6.1, "memory": {"total": 8201719808, "used": 2753937408, "percent": 45.0}, "disk": {"total": 250373009408, "used": 17908064256, "percent": 7.5}, "network": {"bytes_sent": 8628091, "bytes_recv": 128244471}}
-{"timestamp": "2026-01-06T16:40:02.577845", "cpu_percent": 57.0, "memory": {"total": 8201719808, "used": 2811813888, "percent": 47.0}, "disk": {"total": 250373009408, "used": 17911095296, "percent": 7.5}, "network": {"bytes_sent": 8682385, "bytes_recv": 129258334}}

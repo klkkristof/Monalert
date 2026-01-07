@@ -1,47 +1,45 @@
 import psutil
-import json
-import os
-from pathlib import Path
+import time
+import prometheus_client
+from prometheus_client import start_http_server, Gauge
 from datetime import datetime
 
-LOG_DIR = Path("/home/kristof/Documents/Monalert/logs")
-METRICS_FILE = LOG_DIR / "metrics.json"
 
-LOG_DIR.mkdir(parents=True, exist_ok=True)
-if not METRICS_FILE.exists():
-    METRICS_FILE.touch()
+cpu_gauge = Gauge('system_cpu_usage_percent', 'CPU usage %')
+mem_gauge = Gauge('system_memory_usage_percent', 'Memory usage %')
+disk_gauge = Gauge('system_disk_usage_percent', 'Disk usage %')
+net_sent_gauge = Gauge('system_network_bytes_sent_total', 'Network bytes sent total')
+net_recv_gauge = Gauge('system_network_bytes_recv_total', 'Network bytes received total')
+
 
 def collect_metrics():
+    
     cpu_usage = psutil.cpu_percent(interval=1)
+    
     memory = psutil.virtual_memory()
     disk = psutil.disk_usage('/')
     network = psutil.net_io_counters()
     
-    metrics = {
-        'timestamp': datetime.now().isoformat(),
-        'cpu_percent': cpu_usage,
-        'memory': {
-            'total': memory.total,
-            'used': memory.used,
-            'percent': memory.percent
-        },
-        'disk': {
-            'total': disk.total,
-            'used': disk.used,
-            'percent': disk.percent
-        },
-        'network': {
-            'bytes_sent': network.bytes_sent,
-            'bytes_recv': network.bytes_recv
-        }
-    }
+    cpu_gauge.set(cpu_usage)
+    mem_gauge.set(memory.percent)
+    disk_gauge.set(disk.percent)
+    net_sent_gauge.set(network.bytes_sent)
+    net_recv_gauge.set(network.bytes_recv)
     
-    
-    with open('/home/kristof/Documents/Monalert/logs/metrics.json', 'a') as f:
-        f.write(json.dumps(metrics) + '\n')
-    
-    return metrics
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] CPU: {cpu_usage:.1f}% | RAM: {memory.percent:.1f}% | Disk: {disk.percent:.1f}%")
+
 
 if __name__ == "__main__":
-    metrics = collect_metrics()
-    print(json.dumps(metrics, indent=2))
+    
+    start_http_server(8000)
+    print("Monalert Prometheus exporter: http://localhost:8000/metrics")
+    
+    try:
+        while True:
+            collect_metrics()
+            time.sleep(15)
+            
+    except KeyboardInterrupt:
+        print("\nLeallitas...")
+    except Exception as e:
+        print(f"Error: {e}")
